@@ -43,3 +43,22 @@ Tutorial Firebase Authentication menggunakan Postman
 <img width="300" alt="Screenshot 2026-03-13 062656" src="https://github.com/user-attachments/assets/912d5d48-ba21-45be-94f7-0f19595f8fc9" />
 <img width="400" alt="Screenshot 2026-03-13 062742" src="https://github.com/user-attachments/assets/c62d5bdc-0e1b-4928-b1a1-1c2597075d4d" />
 
+## Setup Environment Postman
+ 
+Buat environment baru agar tidak perlu copy-paste API key berulang kali:
+ 
+1. Postman → **Environments** → **New Environment** → beri nama `Firebase Auth Dev`
+2. Tambahkan variabel berikut:
+ 
+| Variabel | Initial Value | Keterangan |
+|---|---|---|
+| `FIREBASE_API_KEY` | `AIzaSyB_xxx...` | Web API Key dari Firebase Console |
+| `FIREBASE_ID_TOKEN` | *(kosong)* | Diisi otomatis setelah login via Test Script |
+| `BACKEND_BASE_URL` | `http://localhost:8080/v1` | Base URL backend kamu |
+| `BACKEND_TOKEN` | *(kosong)* | Token JWT dari backend (diisi setelah verify) |
+| `USER_EMAIL` | `test@example.com` | Email untuk testing |
+| `USER_PASSWORD` | `Test@12345` | Password untuk testing |
+
+## Contoh
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/0174d709-f07f-47e4-8889-8b8f381d50ce" />
+
