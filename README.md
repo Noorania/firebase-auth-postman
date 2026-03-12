@@ -30,3 +30,16 @@ Tutorial Firebase Authentication menggunakan Postman
 <img width="500" alt="Screenshot 2026-03-13 061627" src="https://github.com/user-attachments/assets/f37022c7-df90-475a-b442-ca605b88b116" />
 <img width="400" alt="Screenshot 2026-03-13 061644" src="https://github.com/user-attachments/assets/852c3987-886a-40d7-bf9b-011a72f1772d" />
 <img width="500" alt="Screenshot 2026-03-13 061912" src="https://github.com/user-attachments/assets/6e383026-4cbd-4ec9-8ef0-ca4ffae4bab0" />
+
+## Langkah 3 — Daftarkan Aplikasi Web
+ 
+1. Di halaman utama proyek, klik ikon **`</>`** (Web)
+2. Beri nama aplikasi kamu, lalu klik **Daftarkan Aplikasi**
+3. Salin konfigurasi `firebaseConfig` yang muncul — kamu akan membutuhkannya di langkah berikutnya
+
+## Contoh
+<img width="300" alt="Screenshot 2026-03-13 062356" src="https://github.com/user-attachments/assets/7d43dd1b-519f-4830-891e-ef76a9d77bf3" />
+<img width="300" alt="Screenshot 2026-03-13 062410" src="https://github.com/user-attachments/assets/5e7579a9-0c64-4ceb-9bb3-bbc8c8a9e453" />
+<img width="300" alt="Screenshot 2026-03-13 062656" src="https://github.com/user-attachments/assets/912d5d48-ba21-45be-94f7-0f19595f8fc9" />
+<img width="400" alt="Screenshot 2026-03-13 062742" src="https://github.com/user-attachments/assets/c62d5bdc-0e1b-4928-b1a1-1c2597075d4d" />
+
