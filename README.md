@@ -62,3 +62,106 @@ Buat environment baru agar tidak perlu copy-paste API key berulang kali:
 ## Contoh
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/0174d709-f07f-47e4-8889-8b8f381d50ce" />
 
+
+## Urutan Pengujian
+ 
+```
+STEP 1 → Register (Firebase REST API)
+STEP 2 → Kirim Verifikasi Email
+STEP 3 → Cek Status Verifikasi (via Firebase & Backend)
+STEP 4 → Login (Firebase REST API)
+STEP 5 → POST Token ke Backend
+STEP 6 → Akses Protected Endpoint
+```
+## Step 1 — Register Akun Baru
+ 
+**Firebase: `signUp` endpoint**
+ 
+### Endpoint
+ 
+```
+POST https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={{FIREBASE_API_KEY}}
+```
+ 
+### Headers
+ 
+| Key | Value |
+|---|---|
+| `Content-Type` | `application/json` |
+ 
+### Request Body
+ 
+```json
+{
+  "email": "{{USER_EMAIL}}",
+  "password": "{{USER_PASSWORD}}",
+  "returnSecureToken": true
+}
+```
+ 
+| Field | Tipe | Keterangan |
+|---|---|---|
+| `email` | string | Harus format email valid |
+| `password` | string | Minimal 6 karakter |
+| `returnSecureToken` | boolean | **WAJIB** `true` agar Firebase mengembalikan `idToken` & `refreshToken` |
+ 
+### Response Sukses — 200 OK
+ 
+```json
+{
+  "kind": "identitytoolkit#SignupNewUserResponse",
+  "localId": "aBcDeFgHiJkLmN",
+  "email": "test@example.com",
+  "idToken": "eyJhbGciOiJSUzI1...",
+  "registered": false,
+  "refreshToken": "AMf-vBxK...",
+  "expiresIn": "3600"
+}
+```
+ 
+### Response Error — Contoh
+ 
+```json
+{
+  "error": {
+    "code": 400,
+    "message": "EMAIL_EXISTS",
+    "status": "INVALID_ARGUMENT"
+  }
+}
+```
+
+
+| Kode Error | Artinya | Solusi |
+|---|---|---|
+| `EMAIL_EXISTS` | Email sudah terdaftar | Gunakan email lain |
+| `INVALID_EMAIL` | Format email salah | Periksa format email |
+| `WEAK_PASSWORD` | Password kurang dari 6 karakter | Gunakan minimal 6 karakter |
+| `OPERATION_NOT_ALLOWED` | Email/Password auth belum diaktifkan | Aktifkan di Firebase Console → Authentication → Sign-in method |
+| `TOO_MANY_ATTEMPTS_TRY_LATER` | Terlalu banyak percobaan | Tunggu beberapa menit |
+ 
+### Postman Test Script — Auto-save Token
+ 
+Tempel di tab **Tests**:
+ 
+```js
+const json = pm.response.json();
+ 
+if (pm.response.code === 200) {
+  pm.environment.set("FIREBASE_ID_TOKEN", json.idToken);
+  pm.environment.set("FIREBASE_LOCAL_ID", json.localId);
+  pm.environment.set("FIREBASE_REFRESH_TOKEN", json.refreshToken);
+  console.log("Register sukses. UID:", json.localId);
+  console.log("PERHATIAN: Email belum diverifikasi. Lanjut ke Step 2.");
+} else {
+  console.log("Register gagal:", json.error.message);
+}
+```
+
+## Contoh
+
+<img width="500" alt="Screenshot 2026-03-13 070021" src="https://github.com/user-attachments/assets/7296108a-b60d-45c7-9e24-a92cae0fda95" />
+<img width="500" alt="Screenshot 2026-03-13 070036" src="https://github.com/user-attachments/assets/c75ef167-53f7-4331-bbdd-1010d844a2a4" />
+<img width="500" alt="Screenshot 2026-03-13 070058" src="https://github.com/user-attachments/assets/23ed8698-caf6-45fb-b100-da41ea89d1af" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/2e5e1eed-05dc-4614-9b47-bda9bc704f06" />
+
