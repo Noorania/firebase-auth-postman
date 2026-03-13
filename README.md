@@ -241,3 +241,58 @@ if (pm.response.code === 200) {
 <img width="500" alt="Screenshot 2026-03-13 071500" src="https://github.com/user-attachments/assets/61ef53c3-cae7-4d64-b93d-28a3f34a5c91" />
 <img width="300" alt="Screenshot 2026-03-13 071516" src="https://github.com/user-attachments/assets/7f489d84-71a7-46c0-8bbc-21a265a067fc" />
 
+## Step 3 — Cek Status Verifikasi
+ 
+Ada **2 cara** mengecek apakah email sudah diverifikasi:
+ 
+| Cara | Endpoint | Kapan Dipakai |
+|---|---|---|
+| **Cara A** | Firebase `accounts:lookup` | Debugging, backend belum siap |
+| **Cara B** | Backend `/auth/verify-token` | Testing alur login normal, sekalian dapat Backend Token |
+ 
+### Cara A — Cek Langsung ke Firebase
+ 
+```
+POST https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={{FIREBASE_API_KEY}}
+```
+ 
+**Request Body:**
+```json
+{
+  "idToken": "{{FIREBASE_ID_TOKEN}}"
+}
+```
+ 
+**Response — Email BELUM diverifikasi:**
+```json
+{
+  "users": [
+    {
+      "localId": "aBcDeFgHiJkLmN",
+      "email": "test@example.com",
+      "emailVerified": false,
+      ...
+    }
+  ]
+}
+```
+ 
+**Response — Email SUDAH diverifikasi:**
+```json
+{
+  "users": [
+    {
+      "localId": "aBcDeFgHiJkLmN",
+      "email": "test@example.com",
+      "emailVerified": true,
+      ...
+    }
+  ]
+}
+```
+## Contoh
+
+<img width="500"  alt="Screenshot 2026-03-13 072430" src="https://github.com/user-attachments/assets/74904e60-3775-4695-86ee-04e2dba47651" />
+<img width="500"  alt="Screenshot 2026-03-13 072451" src="https://github.com/user-attachments/assets/dc22a23a-25fb-4808-8c2d-1d0590e20606" />
+<img width="500" alt="Screenshot 2026-03-13 072510" src="https://github.com/user-attachments/assets/835d793c-75db-40ae-9657-a05f111bc17b" />
+
