@@ -1,4 +1,4 @@
-# firebase-auth-postman
+<img width="1371" height="208" alt="Screenshot 2026-03-13 071336" src="https://github.com/user-attachments/assets/63a5f58d-8a81-4598-ae15-e50d16e89e42" /># firebase-auth-postman
 Tutorial Firebase Authentication menggunakan Postman
 
 ## 1. Membuat Project Firebase
@@ -164,4 +164,80 @@ if (pm.response.code === 200) {
 <img width="500" alt="Screenshot 2026-03-13 070036" src="https://github.com/user-attachments/assets/c75ef167-53f7-4331-bbdd-1010d844a2a4" />
 <img width="500" alt="Screenshot 2026-03-13 070058" src="https://github.com/user-attachments/assets/23ed8698-caf6-45fb-b100-da41ea89d1af" />
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/2e5e1eed-05dc-4614-9b47-bda9bc704f06" />
+
+
+## Step 2 — Kirim Email Verifikasi
+ 
+**Firebase: `sendOobCode` — meminta Firebase mengirim link ke inbox**
+ 
+### Endpoint
+ 
+```
+POST https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={{FIREBASE_API_KEY}}
+```
+ 
+### Headers
+ 
+| Key | Value |
+|---|---|
+| `Content-Type` | `application/json` |
+ 
+### Request Body
+ 
+```json
+{
+  "requestType": "VERIFY_EMAIL",
+  "idToken": "{{FIREBASE_ID_TOKEN}}"
+}
+```
+ 
+| Field | Tipe | Keterangan |
+|---|---|---|
+| `requestType` | string | **WAJIB** diisi `"VERIFY_EMAIL"` |
+| `idToken` | string | Firebase ID Token dari Step 1 |
+ 
+### Response Sukses — 200 OK
+ 
+```json
+{
+  "kind": "identitytoolkit#GetOobConfirmationCodeResponse",
+  "email": "test@example.com"
+}
+```
+ 
+**Yang terjadi di background:**
+1. Firebase membuat "action link" unik
+2. Firebase mengirim email ke user berisi link verifikasi
+3. User membuka email dan mengklik link tersebut
+4. Status `emailVerified` di Firebase berubah menjadi `true`
+ 
+### Response Error
+ 
+| Kode Error | Artinya | Solusi |
+|---|---|---|
+| `INVALID_ID_TOKEN` | Token kadaluarsa atau tidak valid | Login ulang di Step 4, lalu kirim ulang |
+| `USER_NOT_FOUND` | User tidak ditemukan | Pastikan register berhasil di Step 1 |
+| `TOO_MANY_ATTEMPTS_TRY_LATER` | Firebase membatasi pengiriman email | Tunggu beberapa menit |
+ 
+### Postman Test Script
+ 
+```js
+if (pm.response.code === 200) {
+  const json = pm.response.json();
+  console.log("Email verifikasi dikirim ke:", json.email);
+  console.log("Buka inbox email dan klik link verifikasi.");
+  console.log("Setelah klik, lanjut ke Step 3 untuk cek status.");
+} else {
+  console.log("Gagal kirim email:", pm.response.json().error.message);
+}
+```
+## Contoh
+
+<img width="500" alt="Screenshot 2026-03-13 071220" src="https://github.com/user-attachments/assets/dd48d03d-43fe-46d4-bc01-133d9a183e30" />
+<img width="500" alt="Screenshot 2026-03-13 071232" src="https://github.com/user-attachments/assets/9701c046-eeea-4fc7-9409-c883bd257adb" />
+<img width="500" alt="Screenshot 2026-03-13 071312" src="https://github.com/user-attachments/assets/62e40c96-6cb0-4e49-ac65-01a4a992ba48" />
+<img width="500" alt="Screenshot 2026-03-13 071336" src="https://github.com/user-attachments/assets/90e892c3-7dd3-432f-9ef2-6fcf5b08589c" />
+<img width="500" alt="Screenshot 2026-03-13 071445" src="https://github.com/user-attachments/assets/bbe8126b-93d3-41a1-808a-b07de0710c38" />
+<img width="500" alt="Screenshot 2026-03-13 071500" src="https://github.com/user-attachments/assets/61ef53c3-cae7-4d64-b93d-28a3f34a5c91" />
+<img width="300" alt="Screenshot 2026-03-13 071516" src="https://github.com/user-attachments/assets/7f489d84-71a7-46c0-8bbc-21a265a067fc" />
 
