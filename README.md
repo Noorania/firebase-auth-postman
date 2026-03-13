@@ -296,3 +296,107 @@ POST https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={{FIREBASE_AP
 <img width="500"  alt="Screenshot 2026-03-13 072451" src="https://github.com/user-attachments/assets/dc22a23a-25fb-4808-8c2d-1d0590e20606" />
 <img width="500" alt="Screenshot 2026-03-13 072510" src="https://github.com/user-attachments/assets/835d793c-75db-40ae-9657-a05f111bc17b" />
 
+
+### Cara B — Cek via Backend
+ 
+```
+POST {{BACKEND_BASE_URL}}/auth/verify-token
+```
+ 
+**Headers:**
+ 
+| Key | Value |
+|---|---|
+| `Content-Type` | `application/json` |
+| `Accept` | `application/json` |
+ 
+**Request Body:**
+```json
+{
+  "firebase_token": "{{FIREBASE_ID_TOKEN}}"
+}
+```
+ 
+**Response Sukses (email sudah verified) — 200 OK:**
+```json
+{
+  "success": true,
+  "message": "Token valid",
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5...",
+    "token_type": "Bearer",
+    "expires_in": 86400,
+    "user": {
+      "uid": "aBcDeFgHiJkLmN",
+      "email": "test@example.com",
+      "name": "Test User",
+      "email_verified": true
+    }
+  }
+}
+```
+ 
+**Response Error — Email belum verified (403):**
+```json
+{
+  "success": false,
+  "message": "Email belum diverifikasi. Silakan cek inbox email Anda.",
+  "error_code": "EMAIL_NOT_VERIFIED"
+}
+```
+ 
+**Response Error — Firebase Token tidak valid (401):**
+```json
+{
+  "success": false,
+  "message": "Firebase token tidak valid atau kadaluarsa",
+  "error_code": "INVALID_FIREBASE_TOKEN"
+}
+```
+ 
+**Alur yang terjadi di Backend:**
+```js
+// Pseudocode backend saat menerima firebase_token:
+ 
+1. Terima request: { "firebase_token": "eyJhbG..." }
+ 
+2. Panggil Firebase Admin SDK:
+   decodedToken = firebase.auth().verifyIdToken(firebaseToken)
+ 
+3. Cek field emailVerified:
+   if (!decodedToken.email_verified) {
+     return 403 { message: "Email belum diverifikasi" }
+   }
+ 
+4. Buat user di database jika belum ada (first time login)
+ 
+5. Generate Backend JWT:
+   backendToken = jwt.sign({ uid, email, role }, SECRET_KEY, { expiresIn: "24h" })
+ 
+6. Return 200 { access_token: backendToken, user: {...} }
+```
+ 
+### Postman Test Script — Auto-save Backend Token
+ 
+```js
+const json = pm.response.json();
+ 
+if (pm.response.code === 200 && json.success) {
+  pm.environment.set("BACKEND_TOKEN", json.data.access_token);
+  console.log("Backend token tersimpan.");
+  console.log("email_verified:", json.data.user.email_verified);
+} else if (pm.response.code === 403) {
+  console.log("EMAIL BELUM DIVERIFIKASI");
+  console.log("Buka inbox email dan klik link verifikasi terlebih dahulu.");
+} else if (pm.response.code === 401) {
+  console.log("Firebase token tidak valid. Lakukan login ulang di Step 4.");
+}
+ 
+// Test assertions (opsional):
+pm.test("Status 200", () => pm.response.to.have.status(200));
+pm.test("Ada access_token", () => {
+  pm.expect(json.data).to.have.property("access_token");
+});
+```
+ 
+
