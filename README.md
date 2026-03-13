@@ -398,5 +398,91 @@ pm.test("Ada access_token", () => {
   pm.expect(json.data).to.have.property("access_token");
 });
 ```
- 
 
+
+## Step 4 — Login dengan Email & Password
+ 
+**Firebase: `signInWithPassword` — mendapatkan ID Token baru**
+ 
+> **Mengapa perlu login ulang setelah register?**
+> `idToken` dari Step 1 kadaluarsa setelah 1 jam. Selain itu, setelah user mengklik link verifikasi, `idToken` lama tidak otomatis terupdate. Dengan login ulang, Firebase mengembalikan `idToken` **baru** yang sudah merefleksikan `emailVerified: true`.
+ 
+### Endpoint
+ 
+```
+POST https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{FIREBASE_API_KEY}}
+```
+ 
+### Request Body
+ 
+```json
+{
+  "email": "{{USER_EMAIL}}",
+  "password": "{{USER_PASSWORD}}",
+  "returnSecureToken": true
+}
+```
+ 
+### Response Sukses — 200 OK
+ 
+```json
+{
+  "kind": "identitytoolkit#VerifyPasswordResponse",
+  "localId": "aBcDeFgHiJkLmN",
+  "email": "test@example.com",
+  "displayName": "Test User",
+  "idToken": "eyJhbGciOiJSUzI1...",
+  "registered": true,
+  "refreshToken": "AMf-vBxK...",
+  "expiresIn": "3600"
+}
+```
+ 
+### Decode Firebase ID Token (Opsional)
+ 
+Salin `idToken` dan tempel ke [jwt.io](https://jwt.io) untuk melihat isi payload:
+ 
+```json
+{
+  "iss": "https://securetoken.google.com/YOUR_PROJECT_ID",
+  "aud": "YOUR_PROJECT_ID",
+  "user_id": "aBcDeFgHiJkLmN",
+  "email": "test@example.com",
+  "email_verified": true,
+  "firebase": {
+    "sign_in_provider": "password"
+  }
+}
+```
+ 
+Cari field `email_verified` — ini yang dibaca oleh backend saat memverifikasi token.
+ 
+### Response Error
+ 
+| Kode Error | Artinya | Solusi |
+|---|---|---|
+| `INVALID_PASSWORD` | Password salah | Periksa kembali password |
+| `EMAIL_NOT_FOUND` | Email belum terdaftar | Lakukan register di Step 1 terlebih dahulu |
+| `USER_DISABLED` | Akun di-disable oleh admin | Hubungi admin di Firebase Console |
+| `TOO_MANY_ATTEMPTS_TRY_LATER` | Login diblokir karena terlalu banyak percobaan gagal | Tunggu beberapa menit |
+ 
+### Postman Test Script — Auto-update Token
+ 
+```js
+const json = pm.response.json();
+ 
+if (pm.response.code === 200) {
+  pm.environment.set("FIREBASE_ID_TOKEN", json.idToken);
+  pm.environment.set("FIREBASE_REFRESH_TOKEN", json.refreshToken);
+  console.log("Login berhasil. Token diperbarui.");
+  console.log("Lanjut ke Step 5: kirim token ke backend.");
+} else {
+  console.log("Login gagal:", json.error.message);
+}
+```
+## Contoh 
+
+<img width="500"  alt="Screenshot 2026-03-13 075154" src="https://github.com/user-attachments/assets/3cb2e1b9-c16c-4b7d-95f2-a2e4412d1d5e" />
+<img width="500"  alt="Screenshot 2026-03-13 075207" src="https://github.com/user-attachments/assets/29e7b81f-9ef0-4d40-a673-eed8b5629c30" />
+<img width="500"  alt="Screenshot 2026-03-13 080316" src="https://github.com/user-attachments/assets/27316b29-46bc-4012-b988-bb99c4e8649c" />
+<img width="500"  alt="Screenshot 2026-03-13 080451" src="https://github.com/user-attachments/assets/f2ac65bb-66d0-4743-b700-a8bd348eb503" />
